@@ -1,0 +1,44 @@
+Settings:
+  #机器人管理员QQ
+  admin: 2821396723
+  #是否开启审核消息推送 默认开启
+  #如果你群聊较多建议关闭
+  MessagePush: true
+  # 是否开启自动同意功能(根据下方VerificationMessageCategories的关键词)
+  AutoAgreeFun: true
+  # 是否开启自动拒绝功能(开启之后审核不通过就自动拒绝)
+  AutoRefuseFun: true
+  # 是否开启等级验证(等级不够的就会验证失败,默认0为不开启)
+  level_limit_min: 0
+  #审核通过发送私聊信息给机器人管理员
+  #这里的{qq}代表申请人qq号
+  #{message}代表申请人发送的验证消息具体内容
+  AutoAgreedMessagePrivate: "用户{qq}通过自动审核\n{message}"
+  #拒绝之后 返回验证消息给申请人
+  AutoRefuseMessage: "验证失败，无法加入群聊"
+  #审核不通过发送私聊消息告知机器人管理员(非群聊管理)
+  AutoRefuseMessagePrivate: "用户{qq}验证消息不通过 请重新申请群聊\n{message}"
+  # 启动自动审查的群聊列表
+  GroupList:
+    - "00000000"
+    - "2821396723"
+  #监听关键词
+  GroupKeywordListen: "成员统计"
+  # 如果包含下列内容就自动同意
+  # 验证消息分类
+  VerificationMessageCategories:
+    #类别
+    - name: "mcbbs"
+      #该类别关键字
+      keywords:
+        - "mcbbs"
+        - "bbs"
+        - "[regex] .*"
+    - name: "九域"
+      keywords:
+        - "九域"
+        - "9y"
+    - name: "bilibili"
+      keywords:
+        - "bilibili"
+        - "b站"

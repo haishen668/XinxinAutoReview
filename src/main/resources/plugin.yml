@@ -1,0 +1,8 @@
+name: XinxinAutoReview
+version: '${project.version}'
+main: ltd.dreamcraft.xinxinautoreview.XinxinAutoReview
+api-version: '1.13'
+depend: [ XinxinBotApi ]
+commands:
+  xinxinautoreview:
+    aliases: [ xxar ]
