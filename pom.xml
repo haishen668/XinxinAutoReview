@@ -73,15 +73,23 @@
         </dependency>
         <!-- https://mvnrepository.com/artifact/jfree/jfreechart -->
         <dependency>
-            <groupId>jfree</groupId>
+            <groupId>org.jfree</groupId>
             <artifactId>jfreechart</artifactId>
-            <version>1.0.10</version>
+            <version>1.5.3</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.json/json -->
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20231013</version>
+        </dependency>
+        <!-- XinxinBotApi -->
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>XinxinBotApi</artifactId>
+            <version>2.2.14-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/XinxinBotApi-2.1.4-SNAPSHOT.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

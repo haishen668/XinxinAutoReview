@@ -1,7 +1,9 @@
 package ltd.dreamcraft.xinxinautoreview.listeners;
 
 import com.xinxin.BotApi.BotAction;
+import com.xinxin.BotEvent.GroupMessageEvent;
 import com.xinxin.BotEvent.GroupRequestEvent;
+import com.xinxin.GroupData.GroupMemberInfo;
 import ltd.dreamcraft.xinxinautoreview.XinxinAutoReview;
 import ltd.dreamcraft.xinxinautoreview.utils.MessageUtil;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -22,6 +24,7 @@ import java.util.regex.Pattern;
  */
 public class OnUserRequestJoin implements Listener {
     String flag = "";
+
     @EventHandler
     public void RequestCheck(GroupRequestEvent event) {
         // 防止重复执行 验证消息会有flag 如果是重复的flag就代表是重复的验证消息就不会执行下面的程序
@@ -39,20 +42,20 @@ public class OnUserRequestJoin implements Listener {
 
         if (groupList.contains(String.valueOf(event.getGroup_id()))) {
             //等级验证 1.0.1 功能添加
-            int levelLimit = config.getInt("Settings.level_limit_min",0);
-            if (levelLimit != 0){
+            int levelLimit = config.getInt("Settings.level_limit_min", 0);
+            if (levelLimit != 0) {
                 int level = getQQLevel(event);
                 if (level == -1) {
                     System.out.println("功能失效请联系作者");
                     return;
                 }
                 if (level < levelLimit) {
-                    event.setGroupRequest(false, config.getString("Settings.AutoRefuseMessage"));
-                    if (config.getBoolean("Settings.MessagePush")) {
-                        BotAction.sendPrivateMessage(Long.parseLong(config.getString("Settings.admin")), config.getString("Settings.AutoRefuseMessagePrivate")
-                                .replace("{qq}", String.valueOf(event.getUser_id()))
-                                .replace("{message}", event.getComment()));
-                    }
+//                    event.setGroupRequest(false, config.getString("Settings.AutoRefuseMessage"));
+//                    if (config.getBoolean("Settings.MessagePush")) {
+//                        BotAction.sendPrivateMessage(Long.parseLong(config.getString("Settings.admin")), config.getString("Settings.AutoRefuseMessagePrivate")
+//                                .replace("{qq}", String.valueOf(event.getUser_id()))
+//                                .replace("{message}", event.getComment()));
+//                    }
                     return;
                 }
             }
@@ -61,30 +64,31 @@ public class OnUserRequestJoin implements Listener {
             String verifyMessage = event.getComment();
             //标记是否通过验证
             boolean isApprove = false;
-            outerLoop: // 外层循环标签
+            outerLoop:
+            // 外层循环标签
             for (Map.Entry<String, List<String>> entry : XinxinAutoReview.categories.entrySet()) {
                 String categoryName = entry.getKey();
                 List<String> keywords = entry.getValue();
                 for (String keyword : keywords) {
                     //全部转换为小写
                     if (verifyMessage.toLowerCase().contains(keyword.toLowerCase())) {
-                            // 设置验证消息为通过
-                            event.setGroupRequest(true, "");
-                            // 发送私聊消息告诉 管理员(如果消息推送开启)
-                            if (config.getBoolean("Settings.MessagePush")) {
-                                BotAction.sendPrivateMessage(config.getLong("Settings.admin"),
-                                        XinxinAutoReview.getInstance().getConfig().getString("Settings.AutoAgreedMessagePrivate")
-                                                .replace("{qq}", String.valueOf(event.getUser_id()))
-                                                .replace("{message}", event.getComment()));
-                            }
-                            // 使匹配的类别数量+1
-                            XinxinAutoReview.matchedCategoriesCount.put(categoryName, XinxinAutoReview.matchedCategoriesCount.getOrDefault(categoryName, 0) + 1);
-                            //标记通过验证
-                            isApprove = true;
-                            //跳出两层for内层循环至循环标签 否则会处理多条群信息如果内容是mcbbs bbs 这种雷同的东西
-                            break outerLoop;
+                        // 设置验证消息为通过
+                        event.setGroupRequest(true, "");
+                        // 发送私聊消息告诉 管理员(如果消息推送开启)
+                        if (config.getBoolean("Settings.MessagePush")) {
+                            BotAction.sendPrivateMessage(config.getLong("Settings.admin"),
+                                    XinxinAutoReview.getInstance().getConfig().getString("Settings.AutoAgreedMessagePrivate")
+                                            .replace("{qq}", String.valueOf(event.getUser_id()))
+                                            .replace("{message}", event.getComment()));
+                        }
+                        // 使匹配的类别数量+1
+                        XinxinAutoReview.matchedCategoriesCount.put(categoryName, XinxinAutoReview.matchedCategoriesCount.getOrDefault(categoryName, 0) + 1);
+                        //标记通过验证
+                        isApprove = true;
+                        //跳出两层for内层循环至循环标签 否则会处理多条群信息如果内容是mcbbs bbs 这种雷同的东西
+                        break outerLoop;
 
-                    }else {
+                    } else {
                         if (keyword.startsWith("[regex]")) {
                             int answerIndex = verifyMessage.indexOf("答案：");
                             if (answerIndex != -1) {
@@ -153,9 +157,11 @@ public class OnUserRequestJoin implements Listener {
             e.printStackTrace();
         }
     }
+
     private int getQQLevel(GroupRequestEvent event) {
         long qq = event.getUser_id();
-        String urlString = "https://api.52hyjs.com/api/level?qq=" + qq;
+
+        String urlString = "https://free.xwteam.cn/api/qq/level?qq=" + qq;
         int maxRetries = 3;
 
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
@@ -169,7 +175,7 @@ public class OnUserRequestJoin implements Listener {
                     throw new RuntimeException("HTTP GET Request Failed with Error code : " + conn.getResponseCode());
                 }
 
-                BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 StringBuilder sb = new StringBuilder();
                 String output;
                 while ((output = br.readLine()) != null) {
@@ -179,10 +185,15 @@ public class OnUserRequestJoin implements Listener {
 
                 JSONObject json = new JSONObject(sb.toString());
 
-                if (json.has("data")) {
-                    JSONObject dataObject = json.getJSONObject("data");
-                    if (dataObject != null && dataObject.has("iQQLevel")) {
-                        return dataObject.getInt("iQQLevel");
+                // 检查返回码是否为 200（Success）
+                if (json.getInt("code") == 200) {
+                    // 根据提供的JSON结构，从data对象中获取Level字段（字符串类型）
+                    if (json.has("data")) {
+                        JSONObject data = json.getJSONObject("data");
+                        if (data.has("Level")) {
+                            String levelStr = data.getString("Level"); // 获取字符串类型的Level
+                            return Integer.parseInt(levelStr); // 转换为整数
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -195,6 +206,7 @@ public class OnUserRequestJoin implements Listener {
 
         return -1;
     }
+
 }
 
 

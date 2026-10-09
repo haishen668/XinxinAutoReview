@@ -1,6 +1,4 @@
 package ltd.dreamcraft.xinxinautoreview;
-
-import com.sun.istack.internal.NotNull;
 import com.xinxin.BotApi.BotAction;
 import ltd.dreamcraft.xinxinautoreview.listeners.OnGroupMessage;
 import ltd.dreamcraft.xinxinautoreview.listeners.OnPrivateMessage;
@@ -70,7 +68,7 @@ public final class XinxinAutoReview extends JavaPlugin {
         categories.clear();
     }
 
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 1 && sender.hasPermission("AutoReview.admin")) {
             if (args[0].equalsIgnoreCase("draw")) {
                 Bukkit.getScheduler().runTask(this, () -> {
