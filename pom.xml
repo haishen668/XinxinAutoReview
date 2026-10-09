@@ -13,6 +13,7 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <xinxinbotapi.version>2.1.4-SNAPSHOT</xinxinbotapi.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -87,9 +88,9 @@
         <dependency>
             <groupId>com.example</groupId>
             <artifactId>XinxinBotApi</artifactId>
-            <version>2.2.14-SNAPSHOT</version>
+            <version>${xinxinbotapi.version}</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/libs/XinxinBotApi-2.1.4-SNAPSHOT.jar</systemPath>
+            <systemPath>${project.basedir}/libs/XinxinBotApi-${xinxinbotapi.version}.jar</systemPath>
         </dependency>
     </dependencies>
 </project>
